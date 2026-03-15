@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ada-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "-l", "3000", "/Users/joe/work/educational/adas-learning-and-fun"],
+      "port": 3000
+    }
+  ]
+}

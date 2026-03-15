@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="screen-orientation" content="portrait">
+  <meta name="theme-color" content="#FFB7D5">
+  <title>Ada's Learning AND Fun!</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icons/favicon.svg">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Title / Splash Screen -->
+  <div id="screen-title" class="screen active">
+    <div class="title-content">
+      <div class="kawaii-stars">
+        <span class="star s1">&#x2B50;</span>
+        <span class="star s2">&#x2B50;</span>
+        <span class="star s3">&#x2B50;</span>
+      </div>
+      <div class="title-mascot">&#x1F431;</div>
+      <h1 class="title-text">
+        <span class="title-line1">Ada's</span>
+        <span class="title-line2">Learning <em>&amp;</em> Fun!</span>
+      </h1>
+      <div class="kawaii-sparkles">&#x2728; &#x1F31F; &#x2728;</div>
+      <button id="btn-start" class="btn-kawaii btn-primary">
+        <span>Let's Go!</span>
+      </button>
+    </div>
+    <div class="title-clouds">
+      <div class="cloud cloud-1"></div>
+      <div class="cloud cloud-2"></div>
+      <div class="cloud cloud-3"></div>
+    </div>
+  </div>
+
+  <!-- Player Name Screen -->
+  <div id="screen-name" class="screen">
+    <div class="screen-inner">
+      <button class="btn-back" id="btn-back-name">&#x2190;</button>
+      <div class="name-mascot">&#x1F43B;</div>
+      <h2>What's your name?</h2>
+      <div class="name-input-wrap">
+        <input type="text" id="input-name" class="input-kawaii" placeholder="Type your name..." maxlength="20" autocomplete="off">
+      </div>
+      <button id="btn-name-done" class="btn-kawaii btn-primary" disabled>
+        <span>Play!</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Game Hub / Selection Screen -->
+  <div id="screen-hub" class="screen">
+    <div class="screen-inner">
+      <div class="hub-brand">
+        <span class="hub-brand-text">Ada's Learning <em>&amp;</em> Fun!</span>
+      </div>
+      <div class="hub-header">
+        <div class="hub-greeting">
+          <span class="hub-mascot">&#x1F431;</span>
+          <span>Hi, <strong id="hub-player-name"></strong>!</span>
+        </div>
+        <button id="btn-share" class="btn-icon" title="Share">&#x1F517;</button>
+      </div>
+      <h2 class="hub-title">Pick a Game!</h2>
+      <div class="game-cards">
+        <button class="game-card" data-game="2048">
+          <div class="game-card-icon">&#x1F9E9;</div>
+          <div class="game-card-info">
+            <h3>The Power of X2</h3>
+            <p>Shoot &amp; merge blocks to reach 2048!</p>
+          </div>
+          <div class="game-card-arrow">&#x25B6;</div>
+        </button>
+        <button class="game-card" data-game="blink">
+          <div class="game-card-icon">&#x1F440;</div>
+          <div class="game-card-info">
+            <h3>Fill In the Blink</h3>
+            <p>Spot the missing letter before time runs out!</p>
+          </div>
+          <div class="game-card-arrow">&#x25B6;</div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- The Power of X2 Game -->
+  <div id="screen-2048" class="screen">
+    <div class="screen-inner game-screen-inner">
+      <div class="game-topbar">
+        <button class="btn-back" id="btn-back-2048">&#x2190;</button>
+        <h2>The Power of X2</h2>
+      </div>
+
+      <!-- 8x8 Grid -->
+      <div id="x2-grid-wrap" class="x2-grid-wrap">
+        <div id="x2-grid" class="x2-grid"></div>
+      </div>
+
+      <!-- Column arrows (below grid, aligned with columns) -->
+      <div id="x2-arrows" class="x2-arrows"></div>
+
+      <!-- Current + Next block preview (centered below) -->
+      <div class="x2-block-queue">
+        <div class="x2-block-slot">
+          <div id="x2-current-block" class="x2-preview-block x2-preview-current">2</div>
+        </div>
+        <div class="x2-block-slot">
+          <span class="x2-queue-label">next</span>
+          <div id="x2-next-block" class="x2-preview-block x2-preview-next">2</div>
+        </div>
+      </div>
+
+      <!-- Win / Loss overlay -->
+      <div id="x2-overlay" class="x2-overlay hidden">
+        <div class="x2-overlay-content">
+          <div id="x2-overlay-icon" class="x2-overlay-icon"></div>
+          <h3 id="x2-overlay-title"></h3>
+          <p id="x2-overlay-msg"></p>
+          <button id="x2-play-again" class="btn-kawaii btn-primary"><span>Play Again!</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fill In the Blink Placeholder -->
+  <div id="screen-blink" class="screen">
+    <div class="screen-inner">
+      <div class="game-topbar">
+        <button class="btn-back" id="btn-back-blink">&#x2190;</button>
+        <h2>Fill In the Blink</h2>
+      </div>
+      <div class="placeholder-content">
+        <div class="placeholder-icon blink-eyes">&#x1F440;</div>
+        <p class="placeholder-text">Coming soon!</p>
+        <div class="placeholder-preview">
+          <div class="word-preview">
+            <span>C</span><span class="blink-slot">&#x1F440;</span><span>T</span>
+          </div>
+          <p class="placeholder-desc">Find the missing letter! How many words can you solve in 3 minutes?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/game-x2-engine.js"></script>
+  <script src="js/game-x2.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
