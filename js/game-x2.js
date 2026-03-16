@@ -110,6 +110,9 @@ var PowerOfX2 = (function () {
     nextBlock = E.generateBlock(blockCount);
   }
 
+  // NOTE: We intentionally split place + merge into two phases here
+  // rather than using E.placeAndMerge(), because the UI needs the block
+  // placed and rendered BEFORE merges resolve (shoot animation → then merge).
   function shoot(col) {
     if (gameOver || animating) return;
     if (E.isColumnFull(grid, col)) return;
@@ -145,7 +148,7 @@ var PowerOfX2 = (function () {
         return;
       }
 
-      // Unlock input after merge animation plays
+      // Phase 3: Unlock input after merge animation plays
       setTimeout(function () {
         animating = false;
       }, MERGE_DURATION);

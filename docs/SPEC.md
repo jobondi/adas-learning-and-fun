@@ -36,15 +36,20 @@ js/app.js              — Navigation, player name, PWA setup
 sw.js                  — Service worker (cache-first, v2)
 manifest.json          — PWA manifest (portrait, pink theme)
 tests/                  — Jest unit tests
-  game-x2-engine.test.js — 43 tests covering all engine functions
+  game-x2-engine.test.js — 51 tests covering all engine functions
 package.json            — npm scripts: test (jest), start (serve)
 ```
+
+**Hosting:**
+- GitHub Pages: `https://jobondi.github.io/adas-learning-and-fun/`
+- Repository: `github.com/jobondi/adas-learning-and-fun` (personal account)
+- Deploys automatically on push to `main`
 
 **Key properties:**
 - No app store required — runs in any browser
 - Installable on iOS, Android, tablet, desktop
 - Shareable via URL or QR code
-- Offline-capable via service worker asset caching
+- Offline-capable via service worker asset caching (network-first for app files, cache-first for external resources)
 - Portrait orientation locked
 
 **Input:**
@@ -200,7 +205,7 @@ A spelling and vocabulary game for grades 1–5. A word is displayed with **one 
 
 **Framework:** Jest (v30)
 
-**Test coverage (43 tests):**
+**Test coverage (51 tests):**
 - Constants validation (grid dimensions, win value, spawn values are powers of two)
 - Weighted random selection with deterministic seeded RNG
 - Grid creation and column height measurement
@@ -208,11 +213,12 @@ A spelling and vocabulary game for grades 1–5. A word is displayed with **one 
 - Block generation (normal vs wild, first-block safety)
 - Merge eligibility (same value, different value, wild, null safety)
 - Merge value calculation (full 2→2048 power chain verified)
-- Cascade merge resolution (2+2→4+4→8)
-- Wild card merge behavior
+- Cascade merge resolution (2+2→4+4→8, triple cascade 2→4→8→16)
+- Wild card merge behavior (including wild + 1024 → win)
 - Win detection on reaching 2048
 - Column compaction after merges (no gaps)
 - Place-and-merge convenience wrapper
+- Edge cases: row-0 merges, non-cascading stops, column independence, merged type always normal
 
 **Run tests:** `npm test`
 
@@ -239,8 +245,8 @@ A spelling and vocabulary game for grades 1–5. A word is displayed with **one 
 - Definition source / API or static list for Fill In the Blink
 - Sound design — celebration and blooper audio assets
 - PWA icons (192×192 and 512×512 PNGs referenced in manifest but not yet created)
-- Hosting / deployment strategy for public access
+- ~~Hosting / deployment strategy for public access~~ — resolved: GitHub Pages
 
 ---
 
-*Spec version: 2.0 | Project: Ada's Learning AND Fun!*
+*Spec version: 2.1 | Project: Ada's Learning AND Fun!*

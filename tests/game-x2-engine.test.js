@@ -355,4 +355,83 @@ describe('X2Engine', () => {
       expect(grid[0][0].value).toBe(2048);
     });
   });
+
+  // ===================== Edge Cases =====================
+
+  describe('edge cases', () => {
+    test('resolveMerges at row 0 with nothing above does nothing', () => {
+      const grid = E.createGrid();
+      grid[0][0] = { value: 2, type: 'normal', merged: false };
+      const result = E.resolveMerges(grid, 0, 0);
+      expect(result.won).toBe(false);
+      expect(grid[0][0].value).toBe(2);
+    });
+
+    test('wild merging with 1024 block reaches 2048 and wins', () => {
+      const grid = E.createGrid();
+      grid[0][0] = { value: 1024, type: 'normal', merged: false };
+      const result = E.placeAndMerge(grid, 0, { value: 2, type: 'wild' });
+      expect(result.won).toBe(true);
+      expect(grid[0][0].value).toBe(2048);
+    });
+
+    test('triple cascade: 2+2→4+4→8+8→16', () => {
+      const grid = E.createGrid();
+      grid[0][0] = { value: 8, type: 'normal', merged: false };
+      grid[0][1] = { value: 4, type: 'normal', merged: false };
+      grid[0][2] = { value: 2, type: 'normal', merged: false };
+      grid[0][3] = { value: 2, type: 'normal', merged: false };
+      const result = E.resolveMerges(grid, 0, 3);
+      expect(grid[0][0].value).toBe(16);
+      // All lower rows should be compacted away
+      expect(grid[0][1]).toBeNull();
+      expect(grid[0][2]).toBeNull();
+      expect(grid[0][3]).toBeNull();
+    });
+
+    test('non-cascading merge stops at mismatch', () => {
+      const grid = E.createGrid();
+      grid[0][0] = { value: 16, type: 'normal', merged: false };
+      grid[0][1] = { value: 4, type: 'normal', merged: false };
+      grid[0][2] = { value: 4, type: 'normal', merged: false };
+      const result = E.resolveMerges(grid, 0, 2);
+      expect(grid[0][1].value).toBe(8);  // 4+4 merged
+      expect(grid[0][0].value).toBe(16); // 16 != 8, no cascade
+      expect(grid[0][2]).toBeNull();
+    });
+
+    test('placeAndMerge on different columns is independent', () => {
+      const grid = E.createGrid();
+      E.placeAndMerge(grid, 0, { value: 2, type: 'normal' });
+      E.placeAndMerge(grid, 1, { value: 4, type: 'normal' });
+      expect(grid[0][0].value).toBe(2);
+      expect(grid[1][0].value).toBe(4);
+    });
+
+    test('clearMergedFlags does not affect null cells', () => {
+      const grid = E.createGrid();
+      grid[0][0] = { value: 2, type: 'normal', merged: true };
+      // grid[0][1] is null — should not throw
+      E.clearMergedFlags(grid);
+      expect(grid[0][0].merged).toBe(false);
+      expect(grid[0][1]).toBeNull();
+    });
+
+    test('merged result type is always normal, even from two wilds', () => {
+      const grid = E.createGrid();
+      grid[0][0] = { value: 4, type: 'wild', merged: false };
+      grid[0][1] = { value: 8, type: 'wild', merged: false };
+      E.resolveMerges(grid, 0, 1);
+      expect(grid[0][0].type).toBe('normal');
+      expect(grid[0][0].value).toBe(16); // max(4,8)*2
+    });
+
+    test('getColumnHeight returns 8 for full column', () => {
+      const grid = E.createGrid();
+      for (let r = 0; r < 8; r++) {
+        grid[0][r] = { value: 2, type: 'normal' };
+      }
+      expect(E.getColumnHeight(grid, 0)).toBe(8);
+    });
+  });
 });

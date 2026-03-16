@@ -1,6 +1,7 @@
 {
   "name": "adas-learning-and-fun",
   "version": "1.0.0",
+  "description": "Ada's Learning AND Fun! — a children's educational game suite PWA",
   "main": "sw.js",
   "directories": {
     "doc": "docs"
@@ -9,10 +10,15 @@
     "test": "jest",
     "start": "npx serve -l 3000"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "education",
+    "kids",
+    "pwa",
+    "math",
+    "2048"
+  ],
+  "author": "jobondi",
   "license": "ISC",
-  "description": "",
   "devDependencies": {
     "jest": "^30.3.0"
   }
