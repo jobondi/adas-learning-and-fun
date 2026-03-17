@@ -1,4 +1,4 @@
-# Ada's Learning AND Fun! — Specification v2.0
+# Ada's Learning AND Fun! — Specification v1.0
 
 ---
 
@@ -22,18 +22,25 @@
 **Type:** Progressive Web App (PWA)
 
 **Tech stack:**
-- Vanilla HTML / CSS / JavaScript — no frameworks
+- Vanilla HTML / CSS / JavaScript — no frameworks, no build step
+- IIFE pattern with `var` declarations (ES5-compatible)
 - Single `index.html` with CSS screen-based navigation (opacity/visibility/z-index transitions)
 - Service worker for offline asset caching
+
+**Engine / UI separation pattern:**
+Each mini-game is split into two files:
+- **Engine** — Pure functions IIFE, no DOM dependencies, testable with Jest
+- **UI controller** — IIFE that consumes the engine, manages DOM rendering, animations, and user input
+- Engines export to `window.*` and also `module.exports` for Node.js testing
 
 **File structure:**
 ```
 index.html              — All screens (title, name, hub, games)
-css/style.css           — Full Kawaii theme + game styles (~900 lines)
+css/style.css           — Full Kawaii theme + shared styles (~890 lines)
 js/game-x2-engine.js        — Power of X2: pure game logic, testable
 js/game-x2.js               — Power of X2: UI controller
 js/game-blink-engine.js     — Fill In the Blink: pure game logic, testable
-js/game-blink.js            — Fill In the Blink: UI controller
+js/game-blink.js            — Fill In the Blink: UI controller (~1000 lines, includes injected CSS)
 js/app.js                   — Navigation, player name, PWA setup
 sw.js                       — Service worker (network-first, v4)
 manifest.json               — PWA manifest (portrait, pink theme)
@@ -76,18 +83,18 @@ package.json            — npm scripts: test (jest), start (serve)
 - **Backgrounds:** Pastel gradients per screen
 - **Animations:** Bouncing mascots, twinkling stars, floating clouds, sparkles
 - **Buttons:** 3D push-down effect with box-shadow shift on press
-- **Corners:** Generous border-radius (12px–28px)
+- **Corners:** Generous border-radius (12px-28px)
 
 ---
 
 ## 4. Screen Flow
 
 ```
-Title Screen → Name Screen → Game Hub → [Game Screens]
-     ↑              ↑            ↑
-     └──────────────┘            │
-          (back)                 │
-                    ←────────────┘
+Title Screen -> Name Screen -> Game Hub -> [Game Screens]
+     ^              ^            ^
+     +--------------+            |
+          (back)                 |
+                    <------------+
                        (back)
 ```
 
@@ -95,6 +102,10 @@ Title Screen → Name Screen → Game Hub → [Game Screens]
 - **Name Screen:** "What's your name?" input (skipped if name already in localStorage)
 - **Game Hub:** Branding header, greeting with player name, game cards
 - **Game Screens:** Full-screen game with back button to hub
+
+**Navigation glue (`app.js`):**
+- `navigateTo(screenId)` manages screen transitions via CSS class toggling
+- Exposes `window.adaNavigateTo` for game modules that rebuild their own DOM (e.g., Fill In the Blink replaces its placeholder content on first init, losing the original back button's event listener)
 
 ---
 
@@ -104,7 +115,7 @@ Title Screen → Name Screen → Game Hub → [Game Screens]
 A column-shooter variant of 2048 focused on teaching **powers of two**. Player shoots numbered blocks upward into columns. Matching blocks merge and advance to the next power of two. Goal is to reach 2048.
 
 ### 5.2 Grid
-- **8 columns × 8 rows**
+- **8 columns x 8 rows**
 - Blocks stack from the **top down** (row 0 = visual top, fills downward)
 - Grid rendered as CSS grid inside a rounded white container with lavender border
 
@@ -127,13 +138,13 @@ Spawn values with weights:
 
 ### 5.5 Merge Resolution
 1. Block lands at the next available position in the chosen column
-2. If block matches the value of the block directly above it → merge (value doubles to next power of two)
-3. Check if newly merged block matches the block above it → cascade merge
+2. If block matches the value of the block directly above it -> merge (value doubles to next power of two)
+3. Check if newly merged block matches the block above it -> cascade merge
 4. Repeat until no match or top of column reached
 
-**Power of two sequence:** 2 → 4 → 8 → 16 → 32 → 64 → 128 → 256 → 512 → 1024 → 2048
+**Power of two sequence:** 2 -> 4 -> 8 -> 16 -> 32 -> 64 -> 128 -> 256 -> 512 -> 1024 -> 2048
 
-**Merge formula:** `mergedValue = max(a.value, b.value) × 2`
+**Merge formula:** `mergedValue = max(a.value, b.value) * 2`
 
 ### 5.6 Special Blocks
 
@@ -145,39 +156,39 @@ Spawn values with weights:
 - The wild card is designed to provide occasional relief while keeping focus on learning powers of two
 
 **Iceboxed for future revisions:**
-- ~~Bomb (💣): destroys adjacent blocks on merge~~ — removed to keep game focused on math
-- ~~Multiplier (⚡): merges at 4× instead of 2×~~ — removed to keep game focused on math
+- ~~Bomb: destroys adjacent blocks on merge~~ -- removed to keep game focused on math
+- ~~Multiplier: merges at 4x instead of 2x~~ -- removed to keep game focused on math
 
 ### 5.7 Animations
 
 | Animation | Duration | Description |
 |-----------|----------|-------------|
 | Shoot     | 0.6s     | Block flies straight up from below grid, subtle bounce on landing |
-| Merge Pop | 0.7s     | Scale burst (0.2→1.5→0.85→1.2→1) with golden glow box-shadow |
+| Merge Pop | 0.7s     | Scale burst (0.2->1.5->0.85->1.2->1) with golden glow box-shadow |
 | Wild Glow | 1.5s     | Continuous alternating pulse (scale + box-shadow) on wild blocks |
 
 ### 5.8 Win / Loss Conditions
 - **Win:** Create a **2048 block** through merges
 - **Loss:** Any column fills all 8 rows
-- **No score display** — the only goal is reaching 2048
+- **No score display** -- the only goal is reaching 2048
 
 ### 5.9 Engine Architecture
 
 The game logic is split into two layers:
 
-**`game-x2-engine.js` (X2Engine)** — Pure functions, no DOM:
-- `createGrid()` — initialize 8×8 null grid
-- `getColumnHeight(grid, col)` — count filled slots from top
-- `isColumnFull()`, `isBoardFull()`, `hasFullColumn()` — state checks
-- `generateBlock(blockCount, randValue, randType)` — weighted random with optional seeded RNG
-- `weightedRandom(items, rand)` — generic weighted selection
-- `canMerge(a, b)` — wild or same-value check
-- `getMergedValue(a, b)` — max × 2
-- `clearMergedFlags(grid)` — reset animation flags
-- `resolveMerges(grid, col, startRow)` — cascade merge resolution
-- `placeAndMerge(grid, col, block)` — convenience: place + merge
+**`game-x2-engine.js` (X2Engine)** -- Pure functions, no DOM:
+- `createGrid()` -- initialize 8x8 null grid
+- `getColumnHeight(grid, col)` -- count filled slots from top
+- `isColumnFull()`, `isBoardFull()`, `hasFullColumn()` -- state checks
+- `generateBlock(blockCount, randValue, randType)` -- weighted random with optional seeded RNG
+- `weightedRandom(items, rand)` -- generic weighted selection
+- `canMerge(a, b)` -- wild or same-value check
+- `getMergedValue(a, b)` -- max x 2
+- `clearMergedFlags(grid)` -- reset animation flags
+- `resolveMerges(grid, col, startRow)` -- cascade merge resolution
+- `placeAndMerge(grid, col, block)` -- convenience: place + merge
 
-**`game-x2.js` (PowerOfX2)** — UI controller:
+**`game-x2.js` (PowerOfX2)** -- UI controller:
 - Consumes X2Engine for all logic
 - Manages DOM rendering (grid, queue, overlay)
 - Two-phase animation: shoot first, then merge
@@ -189,47 +200,56 @@ The game logic is split into two layers:
 ## 6. Mini-Game #2: Fill In the Blink
 
 ### 6.1 Concept
-A spelling and vocabulary game for grades 2–4. A word is displayed with **one missing letter** (random position), represented by **blinking eyes 👀**. A short definition appears below as a clue. The player taps the correct letter on a custom on-screen QWERTY keyboard.
+A spelling and vocabulary game for grades 2-4. A word is displayed with **one missing letter** (random position), represented by a **single blinking eye** (closed by default as an em dash, opens to show the eye emoji briefly every 2.5 seconds via JS `setInterval`). A short definition appears below as a clue. The player taps the correct letter on a custom on-screen QWERTY keyboard.
 
 ### 6.2 Word List
 - **200 hardcoded words** with short definitions, organized by grade level:
-  - Grade 2: ~70 words (e.g., "brave", "climb", "whale")
+  - Grade 2: ~71 words (e.g., "brave", "climb", "whale")
   - Grade 3: ~70 words (e.g., "ancient", "explore", "habitat")
-  - Grade 4: ~60 words (e.g., "abandon", "boundary", "evidence")
-- Each word has: `word` (lowercase), `def` (5–12 word definition), `grade` (2, 3, or 4)
+  - Grade 4: ~59 words (e.g., "abandon", "boundary", "evidence")
+- Each word has: `word` (lowercase), `def` (5-12 word definition), `grade` (2, 3, or 4)
 
 ### 6.3 Difficulty Progression
 Configurable thresholds (designed for easy tuning):
 
 | Words Completed | Max Word Grade |
 |-----------------|---------------|
-| 0–7             | Grade 2       |
-| 8–17            | Grade 3       |
+| 0-7             | Grade 2       |
+| 8-17            | Grade 3       |
 | 18+             | Grade 4       |
 
-Follows the **optimal challenge** principle — start easy and increase difficulty as the player demonstrates competence.
+Follows the **optimal challenge** principle -- start easy and increase difficulty as the player demonstrates competence.
 
 ### 6.4 Game Flow
 1. Timer starts at **3 minutes** (180 seconds)
-2. Word displayed with random missing letter (👀) and definition below
+2. Word displayed with random missing letter (shown as em dash / blinking eye) and definition below
 3. Player taps a letter on the QWERTY keyboard
 4. **Correct:** Timer pauses for 3 seconds while celebration animation plays, score increments, auto-advances to next word
-5. **Wrong:** Timer keeps running (that's the penalty!), wrong letter is disabled, ❌ appears on slot with shake animation
+5. **Wrong:** Timer keeps running (that's the penalty!), wrong letter is disabled, X appears on slot with shake animation
 6. After 1/2/3 wrong guesses, 5/10/15 incorrect keys are eliminated from the keyboard (fly-away animation)
 7. When timer reaches 0, end-of-session overlay appears
 
-### 6.5 Animations & Feedback
+### 6.5 Missing Letter Display
+The missing letter slot uses a **single eye emoji** with a JS-driven blink effect:
+- **Default state (closed):** An em dash character, inline with the other letters
+- **Blink (every 2.5s):** JS `setInterval` swaps the em dash to the eye emoji for 400ms, then swaps back
+- No CSS animation -- pure content swap via `textContent` for an instant, crisp blink
+- Blink interval is started on each new word and stopped on correct answer, end of session, or back navigation
+
+### 6.6 Animations & Feedback
 
 **Correct answer** (clock pauses, ~3 seconds):
 Random celebration from a pool of 3 (extensible):
-- **Sparkle**: ✨ particles burst outward from the word
+- **Sparkle**: Sparkle particles burst outward from the word
 - **Confetti**: Colorful confetti pieces fly in all directions
-- **Emoji Burst**: 👍 😊 ⭐ emojis float outward from the word
+- **Emoji Burst**: Thumbs up, smiley, and star emojis float outward from the word
 
-Plus: score bounce animation, ascending two-note chime (C5→E5), haptic vibration (100ms)
+Plus: score bounce animation, ascending two-note chime (C5->E5), haptic vibration (100ms)
+
+Celebration particle positions are computed in JS using `cos()`/`sin()` and passed as `--tx`/`--ty` CSS custom properties (avoids CSS trig function browser compatibility issues).
 
 **Wrong answer** (clock keeps ticking, ~3 seconds):
-- ❌ replaces the missing letter slot
+- X replaces the missing letter slot
 - Slot shakes side-to-side
 - Guessed key turns pink and is disabled
 - After 500ms delay, additional keys fly away off the keyboard
@@ -237,32 +257,34 @@ Plus: score bounce animation, ascending two-note chime (C5→E5), haptic vibrati
 
 **Key elimination animation**: Keys shrink, translate in a random direction, and fade out (500ms)
 
-### 6.6 End-of-Session Stats
-- "⏰ Time's Up! 🎉" header
+### 6.7 End-of-Session Stats
+- "Time's Up!" header
 - Score: number of words completed
 - Wrong guesses: total count
 - Scrollable word list in dictionary style (bold word + definition)
 - "Play Again!" button to restart
 
-### 6.7 Engine Architecture
+### 6.8 Engine Architecture
 
-**`game-blink-engine.js` (BlinkEngine)** — Pure functions, no DOM:
-- `WORDS` — 200 words with grade/definition metadata
-- `DIFFICULTY_THRESHOLDS` — configurable progression breakpoints
-- `getDifficulty(wordsCompleted)` — returns max grade for current progress
-- `pickWord(maxGrade, usedIndices)` — random word selection avoiding repeats
-- `pickMissingIndex(word)` — random letter position to blank out
-- `checkGuess(word, missingIndex, guessedLetter)` — case-insensitive check
-- `getEliminatedKeys(word, missingIndex, wrongGuesses)` — deterministic key removal
-- `createSession()`, `recordCorrect()`, `recordWrong()` — session state management
+**`game-blink-engine.js` (BlinkEngine)** -- Pure functions, no DOM:
+- `WORDS` -- 200 words with grade/definition metadata
+- `DIFFICULTY_THRESHOLDS` -- configurable progression breakpoints
+- `getDifficulty(wordsCompleted)` -- returns max grade for current progress
+- `pickWord(maxGrade, usedIndices)` -- random word selection avoiding repeats
+- `pickMissingIndex(word)` -- random letter position to blank out
+- `checkGuess(word, missingIndex, guessedLetter)` -- case-insensitive check
+- `getEliminatedKeys(word, missingIndex, wrongGuesses)` -- deterministic key removal (seeded shuffle)
+- `createSession()`, `recordCorrect()`, `recordWrong()` -- session state management
 
-**`game-blink.js` (FillInTheBlink)** — UI controller:
-- Dynamically builds game DOM (replaces placeholder content on first init)
-- Injects game-specific CSS via `<style>` tag (keeps style.css unchanged)
+**`game-blink.js` (FillInTheBlink)** -- UI controller:
+- Dynamically builds game DOM on first init (replaces placeholder content)
+- Injects game-specific CSS via `<style id="blink-game-styles">` tag
+- JS-driven eye blink via `setInterval` (no CSS animation)
 - Timer using `requestAnimationFrame` with pause/resume
 - QWERTY keyboard with per-key state management
 - Celebration animation system (sparkles, confetti, emoji burst)
 - Web Audio API for sound effects (no audio files needed)
+- Uses `window.adaNavigateTo` for back navigation (since DOM is rebuilt)
 - Exposes `init()` and `start()` to the app shell
 
 ---
@@ -309,12 +331,12 @@ Plus: score bounce animation, ascending two-note chime (C5→E5), haptic vibrati
 
 ## 9. Open Items
 
-- ~~Word list source / curation for Fill In the Blink~~ — resolved: 200 hardcoded words, grades 2–4
-- ~~Definition source for Fill In the Blink~~ — resolved: inline short definitions per word
-- Sound design — additional audio variety beyond current Web Audio tones
-- PWA icons (192×192 and 512×512 PNGs referenced in manifest but not yet created)
-- ~~Hosting / deployment strategy for public access~~ — resolved: GitHub Pages
+- ~~Word list source / curation for Fill In the Blink~~ -- resolved: 200 hardcoded words, grades 2-4
+- ~~Definition source for Fill In the Blink~~ -- resolved: inline short definitions per word
+- Sound design -- additional audio variety beyond current Web Audio tones
+- PWA icons (192x192 and 512x512 PNGs referenced in manifest but not yet created)
+- ~~Hosting / deployment strategy for public access~~ -- resolved: GitHub Pages
 
 ---
 
-*Spec version: 3.0 | Project: Ada's Learning AND Fun!*
+*Spec version: 1.0 | Project: Ada's Learning AND Fun!*

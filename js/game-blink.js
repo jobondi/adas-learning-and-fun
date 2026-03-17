@@ -84,6 +84,7 @@ var FillInTheBlink = (function () {
     // Back button navigates to hub using the shared navigation function
     backBtn.addEventListener('click', function () {
       stopTimer();
+      stopBlinkInterval();
       if (window.adaNavigateTo) {
         window.adaNavigateTo('hub');
       }
