@@ -201,8 +201,16 @@ var FillInTheBlink = (function () {
 
       if (i === missingIndex) {
         span.className += ' blink-slot';
-        span.textContent = '\uD83D\uDC40'; // 👀
         span.id = 'blink-missing-slot';
+        // Eyes on top, underscore below — makes it clear it's one letter
+        var eyes = document.createElement('span');
+        eyes.className = 'blink-slot-eyes';
+        eyes.textContent = '\uD83D\uDC40'; // 👀
+        var underline = document.createElement('span');
+        underline.className = 'blink-slot-underline';
+        underline.textContent = '_';
+        span.appendChild(eyes);
+        span.appendChild(underline);
       } else {
         span.textContent = letters[i];
       }
@@ -419,6 +427,7 @@ var FillInTheBlink = (function () {
   function showCorrectSlot() {
     var slot = document.getElementById('blink-missing-slot');
     if (slot) {
+      slot.innerHTML = '';
       slot.textContent = missingLetter;
       slot.classList.remove('blink-slot');
       slot.classList.add('blink-letter-correct');
@@ -428,6 +437,7 @@ var FillInTheBlink = (function () {
   function showWrongSlot() {
     var slot = document.getElementById('blink-missing-slot');
     if (slot) {
+      slot.innerHTML = '';
       slot.textContent = '\u274C'; // ❌
       slot.classList.add('blink-slot-shake');
     }
@@ -436,8 +446,17 @@ var FillInTheBlink = (function () {
   function clearWrongSlot() {
     var slot = document.getElementById('blink-missing-slot');
     if (slot) {
-      slot.textContent = '\uD83D\uDC40'; // 👀
+      // Restore eyes + underscore structure
+      slot.innerHTML = '';
       slot.classList.remove('blink-slot-shake');
+      var eyes = document.createElement('span');
+      eyes.className = 'blink-slot-eyes';
+      eyes.textContent = '\uD83D\uDC40';
+      var underline = document.createElement('span');
+      underline.className = 'blink-slot-underline';
+      underline.textContent = '_';
+      slot.appendChild(eyes);
+      slot.appendChild(underline);
     }
   }
 
@@ -723,10 +742,26 @@ var FillInTheBlink = (function () {
       '  text-transform: uppercase;',
       '}',
       '.blink-slot {',
-      '  animation: blink-anim 1s ease-in-out infinite;',
-      '  font-size: 36px;',
+      '  display: inline-flex;',
+      '  flex-direction: column;',
+      '  align-items: center;',
       '  min-width: 44px;',
       '  text-align: center;',
+      '  vertical-align: bottom;',
+      '}',
+      '.blink-slot-eyes {',
+      '  font-size: 30px;',
+      '  animation: blink-anim 1s ease-in-out infinite;',
+      '  display: block;',
+      '  line-height: 1;',
+      '}',
+      '.blink-slot-underline {',
+      '  font-size: 48px;',
+      '  font-weight: 900;',
+      '  color: var(--pink-dark);',
+      '  display: block;',
+      '  line-height: 0.4;',
+      '  margin-top: -2px;',
       '}',
       '.blink-letter-correct {',
       '  color: var(--mint);',
