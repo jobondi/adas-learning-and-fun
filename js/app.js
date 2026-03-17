@@ -20,6 +20,7 @@
 
   // --- Navigation ---
   var x2Initialized = false;
+  var blinkInitialized = false;
 
   function navigateTo(screenId) {
     if (!screens[screenId]) return;
@@ -35,7 +36,19 @@
       }
       PowerOfX2.start();
     }
+
+    // Initialize & start Fill In the Blink when entering
+    if (screenId === 'blink') {
+      if (!blinkInitialized) {
+        FillInTheBlink.init();
+        blinkInitialized = true;
+      }
+      FillInTheBlink.start();
+    }
   }
+
+  // Expose navigateTo for game modules that rebuild their own DOM
+  window.adaNavigateTo = navigateTo;
 
   // --- Title screen ---
   document.getElementById('btn-start').addEventListener('click', function () {

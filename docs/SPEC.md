@@ -30,13 +30,16 @@
 ```
 index.html              — All screens (title, name, hub, games)
 css/style.css           — Full Kawaii theme + game styles (~900 lines)
-js/game-x2-engine.js   — Pure game logic, zero DOM deps, testable
-js/game-x2.js          — UI controller (rendering, animations, input)
-js/app.js              — Navigation, player name, PWA setup
-sw.js                  — Service worker (cache-first, v2)
-manifest.json          — PWA manifest (portrait, pink theme)
-tests/                  — Jest unit tests
-  game-x2-engine.test.js — 51 tests covering all engine functions
+js/game-x2-engine.js        — Power of X2: pure game logic, testable
+js/game-x2.js               — Power of X2: UI controller
+js/game-blink-engine.js     — Fill In the Blink: pure game logic, testable
+js/game-blink.js            — Fill In the Blink: UI controller
+js/app.js                   — Navigation, player name, PWA setup
+sw.js                       — Service worker (network-first, v4)
+manifest.json               — PWA manifest (portrait, pink theme)
+tests/                       — Jest unit tests
+  game-x2-engine.test.js    — 51 tests covering X2 engine
+  game-blink-engine.test.js — 58 tests covering Blink engine
 package.json            — npm scripts: test (jest), start (serve)
 ```
 
@@ -185,19 +188,82 @@ The game logic is split into two layers:
 
 ## 6. Mini-Game #2: Fill In the Blink
 
-### 6.1 Status: Placeholder Only
+### 6.1 Concept
+A spelling and vocabulary game for grades 2–4. A word is displayed with **one missing letter** (random position), represented by **blinking eyes 👀**. A short definition appears below as a clue. The player taps the correct letter on a custom on-screen QWERTY keyboard.
 
-Currently shows a "Coming soon!" screen with a preview of the concept (blinking eyes in a word).
+### 6.2 Word List
+- **200 hardcoded words** with short definitions, organized by grade level:
+  - Grade 2: ~70 words (e.g., "brave", "climb", "whale")
+  - Grade 3: ~70 words (e.g., "ancient", "explore", "habitat")
+  - Grade 4: ~60 words (e.g., "abandon", "boundary", "evidence")
+- Each word has: `word` (lowercase), `def` (5–12 word definition), `grade` (2, 3, or 4)
 
-### 6.2 Planned Concept
-A spelling and vocabulary game for grades 1–5. A word is displayed with **one missing letter**, represented by **blinking eyes 👀**. A simple definition appears below as a clue. The player taps the correct letter on a custom on-screen QWERTY keyboard.
+### 6.3 Difficulty Progression
+Configurable thresholds (designed for easy tuning):
 
-### 6.3 Planned Features
-- **3-minute timer** per session
-- Score = number of words correctly completed
-- Custom QWERTY keyboard (no system keyboard)
-- Adaptive difficulty: wrong guesses progressively remove incorrect letter options
-- Haptic feedback where supported
+| Words Completed | Max Word Grade |
+|-----------------|---------------|
+| 0–7             | Grade 2       |
+| 8–17            | Grade 3       |
+| 18+             | Grade 4       |
+
+Follows the **optimal challenge** principle — start easy and increase difficulty as the player demonstrates competence.
+
+### 6.4 Game Flow
+1. Timer starts at **3 minutes** (180 seconds)
+2. Word displayed with random missing letter (👀) and definition below
+3. Player taps a letter on the QWERTY keyboard
+4. **Correct:** Timer pauses for 3 seconds while celebration animation plays, score increments, auto-advances to next word
+5. **Wrong:** Timer keeps running (that's the penalty!), wrong letter is disabled, ❌ appears on slot with shake animation
+6. After 1/2/3 wrong guesses, 5/10/15 incorrect keys are eliminated from the keyboard (fly-away animation)
+7. When timer reaches 0, end-of-session overlay appears
+
+### 6.5 Animations & Feedback
+
+**Correct answer** (clock pauses, ~3 seconds):
+Random celebration from a pool of 3 (extensible):
+- **Sparkle**: ✨ particles burst outward from the word
+- **Confetti**: Colorful confetti pieces fly in all directions
+- **Emoji Burst**: 👍 😊 ⭐ emojis float outward from the word
+
+Plus: score bounce animation, ascending two-note chime (C5→E5), haptic vibration (100ms)
+
+**Wrong answer** (clock keeps ticking, ~3 seconds):
+- ❌ replaces the missing letter slot
+- Slot shakes side-to-side
+- Guessed key turns pink and is disabled
+- After 500ms delay, additional keys fly away off the keyboard
+- Descending sawtooth buzz sound, double-buzz haptic
+
+**Key elimination animation**: Keys shrink, translate in a random direction, and fade out (500ms)
+
+### 6.6 End-of-Session Stats
+- "⏰ Time's Up! 🎉" header
+- Score: number of words completed
+- Wrong guesses: total count
+- Scrollable word list in dictionary style (bold word + definition)
+- "Play Again!" button to restart
+
+### 6.7 Engine Architecture
+
+**`game-blink-engine.js` (BlinkEngine)** — Pure functions, no DOM:
+- `WORDS` — 200 words with grade/definition metadata
+- `DIFFICULTY_THRESHOLDS` — configurable progression breakpoints
+- `getDifficulty(wordsCompleted)` — returns max grade for current progress
+- `pickWord(maxGrade, usedIndices)` — random word selection avoiding repeats
+- `pickMissingIndex(word)` — random letter position to blank out
+- `checkGuess(word, missingIndex, guessedLetter)` — case-insensitive check
+- `getEliminatedKeys(word, missingIndex, wrongGuesses)` — deterministic key removal
+- `createSession()`, `recordCorrect()`, `recordWrong()` — session state management
+
+**`game-blink.js` (FillInTheBlink)** — UI controller:
+- Dynamically builds game DOM (replaces placeholder content on first init)
+- Injects game-specific CSS via `<style>` tag (keeps style.css unchanged)
+- Timer using `requestAnimationFrame` with pause/resume
+- QWERTY keyboard with per-key state management
+- Celebration animation system (sparkles, confetti, emoji burst)
+- Web Audio API for sound effects (no audio files needed)
+- Exposes `init()` and `start()` to the app shell
 
 ---
 
@@ -205,20 +271,22 @@ A spelling and vocabulary game for grades 1–5. A word is displayed with **one 
 
 **Framework:** Jest (v30)
 
-**Test coverage (51 tests):**
-- Constants validation (grid dimensions, win value, spawn values are powers of two)
-- Weighted random selection with deterministic seeded RNG
-- Grid creation and column height measurement
-- Column/board full state detection
-- Block generation (normal vs wild, first-block safety)
-- Merge eligibility (same value, different value, wild, null safety)
-- Merge value calculation (full 2→2048 power chain verified)
-- Cascade merge resolution (2+2→4+4→8, triple cascade 2→4→8→16)
-- Wild card merge behavior (including wild + 1024 → win)
-- Win detection on reaching 2048
-- Column compaction after merges (no gaps)
-- Place-and-merge convenience wrapper
-- Edge cases: row-0 merges, non-cascading stops, column independence, merged type always normal
+**Test coverage (109 tests):**
+
+*X2 Engine (51 tests):*
+- Constants, weighted random, grid creation, column height
+- Column/board state detection, block generation
+- Merge eligibility, merge values (full power chain)
+- Cascade merges, wild card behavior, win detection
+- Column compaction, place-and-merge, edge cases
+
+*Blink Engine (58 tests):*
+- Constants, word list validation (200 words, grades, no duplicates)
+- Difficulty progression thresholds and boundary values
+- Word selection (grade filtering, used-index avoidance, exhaustion)
+- Missing index selection, guess checking (case-insensitive)
+- Key elimination (counts per wrong-guess level, never eliminates correct letter, determinism)
+- Session state management (create, recordCorrect, recordWrong)
 
 **Run tests:** `npm test`
 
@@ -228,10 +296,10 @@ A spelling and vocabulary game for grades 1–5. A word is displayed with **one 
 
 - **The Power of X2:** Difficulty progression (higher spawn values as game advances)
 - **The Power of X2:** Additional special blocks focused on powers-of-two learning
-- **Fill In the Blink:** Full implementation with word lists for grades 1–5
 - **Fill In the Blink:** Two missing letters (hard mode)
 - **Fill In the Blink:** Themed word category packs
-- **Suite:** Sound effects and haptic feedback
+- **Fill In the Blink:** Expanded word list (grades 1 and 5)
+- **Fill In the Blink:** More celebration animations (extensible pool)
 - **Suite:** Full offline mode (service worker caches all assets)
 - **Suite:** Player progress persistence
 - **Suite:** Additional mini-games
@@ -241,12 +309,12 @@ A spelling and vocabulary game for grades 1–5. A word is displayed with **one 
 
 ## 9. Open Items
 
-- Word list source / curation for Fill In the Blink
-- Definition source / API or static list for Fill In the Blink
-- Sound design — celebration and blooper audio assets
+- ~~Word list source / curation for Fill In the Blink~~ — resolved: 200 hardcoded words, grades 2–4
+- ~~Definition source for Fill In the Blink~~ — resolved: inline short definitions per word
+- Sound design — additional audio variety beyond current Web Audio tones
 - PWA icons (192×192 and 512×512 PNGs referenced in manifest but not yet created)
 - ~~Hosting / deployment strategy for public access~~ — resolved: GitHub Pages
 
 ---
 
-*Spec version: 2.1 | Project: Ada's Learning AND Fun!*
+*Spec version: 3.0 | Project: Ada's Learning AND Fun!*

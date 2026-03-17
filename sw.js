@@ -1,11 +1,13 @@
 // Service Worker — network-first for HTML/JS, cache-first for fonts/images
-var CACHE_NAME = 'ada-fun-v3';
+var CACHE_NAME = 'ada-fun-v4';
 var ASSETS = [
   '/',
   '/index.html',
   '/css/style.css',
   '/js/game-x2-engine.js',
   '/js/game-x2.js',
+  '/js/game-blink-engine.js',
+  '/js/game-blink.js',
   '/js/app.js',
   '/manifest.json',
 ];
