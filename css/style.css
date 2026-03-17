@@ -580,18 +580,7 @@ html, body {
   color: var(--text);
 }
 
-.blink-slot {
-  animation: blink-anim 1s ease-in-out infinite;
-}
-
-.blink-eyes {
-  animation: blink-anim 1s ease-in-out infinite !important;
-}
-
-@keyframes blink-anim {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.2; }
-}
+/* blink-anim removed — eye blink is now JS-driven in game-blink.js */
 
 /* ===== Power of X2 Game ===== */
 .game-screen-inner {

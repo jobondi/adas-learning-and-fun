@@ -38,6 +38,7 @@ var FillInTheBlink = (function () {
   var animating;
   var rafId;
   var audioCtx;
+  var blinkIntervalId;
 
   // ===================== DOM Refs =====================
 
@@ -187,6 +188,29 @@ var FillInTheBlink = (function () {
     }
   }
 
+  // ===================== Eye Blink (JS-driven) =====================
+
+  function startBlinkInterval() {
+    stopBlinkInterval();
+    blinkIntervalId = setInterval(function () {
+      var eye = document.querySelector('.blink-slot-eye');
+      if (!eye) return;
+      // Open the eye
+      eye.textContent = '\uD83D\uDC41\uFE0F'; // 👁️
+      setTimeout(function () {
+        // Close it back to a dash
+        if (eye.parentNode) eye.textContent = '\u2014'; // —
+      }, 400);
+    }, 2500);
+  }
+
+  function stopBlinkInterval() {
+    if (blinkIntervalId) {
+      clearInterval(blinkIntervalId);
+      blinkIntervalId = null;
+    }
+  }
+
   // ===================== Rendering =====================
 
   function renderWord() {
@@ -202,15 +226,11 @@ var FillInTheBlink = (function () {
       if (i === missingIndex) {
         span.className += ' blink-slot';
         span.id = 'blink-missing-slot';
-        // Eyes on top, underscore below — makes it clear it's one letter
-        var eyes = document.createElement('span');
-        eyes.className = 'blink-slot-eyes';
-        eyes.textContent = '\uD83D\uDC40'; // 👀
-        var underline = document.createElement('span');
-        underline.className = 'blink-slot-underline';
-        underline.textContent = '_';
-        span.appendChild(eyes);
-        span.appendChild(underline);
+        // Single blinking eye — starts closed (dash), JS interval opens it
+        var eye = document.createElement('span');
+        eye.className = 'blink-slot-eye';
+        eye.textContent = '\u2014'; // — (closed state)
+        span.appendChild(eye);
       } else {
         span.textContent = letters[i];
       }
@@ -446,17 +466,13 @@ var FillInTheBlink = (function () {
   function clearWrongSlot() {
     var slot = document.getElementById('blink-missing-slot');
     if (slot) {
-      // Restore eyes + underscore structure
+      // Restore closed eye (dash) structure
       slot.innerHTML = '';
       slot.classList.remove('blink-slot-shake');
-      var eyes = document.createElement('span');
-      eyes.className = 'blink-slot-eyes';
-      eyes.textContent = '\uD83D\uDC40';
-      var underline = document.createElement('span');
-      underline.className = 'blink-slot-underline';
-      underline.textContent = '_';
-      slot.appendChild(eyes);
-      slot.appendChild(underline);
+      var eye = document.createElement('span');
+      eye.className = 'blink-slot-eye';
+      eye.textContent = '\u2014'; // — (closed state)
+      slot.appendChild(eye);
     }
   }
 
@@ -587,12 +603,14 @@ var FillInTheBlink = (function () {
 
     resetKeyboard();
     renderWord();
+    startBlinkInterval();
   }
 
   // ===================== End-of-Session =====================
 
   function showEndOverlay() {
     stopTimer();
+    stopBlinkInterval();
     animating = true;
 
     elOverlayTitle.innerHTML = '\u23F0 Time\'s Up! \uD83C\uDF89';
@@ -743,25 +761,15 @@ var FillInTheBlink = (function () {
       '}',
       '.blink-slot {',
       '  display: inline-flex;',
-      '  flex-direction: column;',
       '  align-items: center;',
-      '  min-width: 44px;',
+      '  justify-content: center;',
+      '  min-width: 40px;',
       '  text-align: center;',
-      '  vertical-align: baseline;',
       '}',
-      '.blink-slot-eyes {',
-      '  font-size: 26px;',
-      '  animation: blink-anim 1s ease-in-out infinite;',
+      '.blink-slot-eye {',
+      '  font-size: 36px;',
       '  display: block;',
       '  line-height: 1;',
-      '  margin-bottom: -6px;',
-      '}',
-      '.blink-slot-underline {',
-      '  font-size: 40px;',
-      '  font-weight: 900;',
-      '  color: var(--pink-dark);',
-      '  display: block;',
-      '  line-height: 0.3;',
       '}',
       '.blink-letter-correct {',
       '  color: var(--mint);',
