@@ -561,7 +561,6 @@ var FillInTheBlink = (function () {
     var btn = keyButtons[letter.toUpperCase()];
     if (btn) {
       btn.disabled = true;
-      btn.classList.add('blink-key-wrong');
     }
 
     // Record in engine session
@@ -903,10 +902,6 @@ var FillInTheBlink = (function () {
       '.blink-key:disabled {',
       '  opacity: 0.4;',
       '  cursor: not-allowed;',
-      '}',
-      '.blink-key-wrong {',
-      '  background: #FFD6D6;',
-      '  color: #CC4444;',
       '}',
       '.blink-key-fly-away {',
       '  animation: blink-key-fly 0.5s ease-in forwards;',
