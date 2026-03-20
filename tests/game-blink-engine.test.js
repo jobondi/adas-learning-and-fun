@@ -40,8 +40,8 @@ describe('BlinkEngine', () => {
   // ===================== Word List =====================
 
   describe('word list', () => {
-    test('contains exactly 200 words', () => {
-      expect(E.WORDS.length).toBe(200);
+    test('contains exactly 300 words', () => {
+      expect(E.WORDS.length).toBe(300);
     });
 
     test('every word has word, def, and grade properties', () => {

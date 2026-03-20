@@ -606,7 +606,7 @@ html, body {
 }
 
 .game-topbar h2 {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 900;
   color: var(--text);
   flex: 1;
