@@ -443,6 +443,38 @@ var FillInTheBlink = (function () {
     elScore.classList.add('blink-score-bounce');
   }
 
+  function floatTimerBonus(amount) {
+    var isPositive = amount > 0;
+    var label = isPositive ? ('+' + amount) : String(amount);
+
+    var el = document.createElement('div');
+    el.className = 'blink-timer-bonus ' + (isPositive ? 'blink-bonus-positive' : 'blink-bonus-negative');
+    el.textContent = label;
+
+    // Position it over the word area
+    var wordRect = elWordDisplay.getBoundingClientRect();
+    var timerRect = elTimerBar.getBoundingClientRect();
+    var parentRect = elWordDisplay.closest('.screen-inner').getBoundingClientRect();
+
+    el.style.left = (wordRect.left - parentRect.left + wordRect.width / 2) + 'px';
+    el.style.top = (wordRect.top - parentRect.top) + 'px';
+
+    // Calculate how far to fly up to reach the timer
+    var dy = timerRect.top - wordRect.top;
+    el.style.setProperty('--fly-y', dy + 'px');
+
+    elWordDisplay.closest('.screen-inner').appendChild(el);
+
+    // Adjust time
+    timeRemaining = Math.max(0, Math.min(timeRemaining + amount, TOTAL_TIME));
+    renderTimer();
+
+    // Clean up after animation
+    setTimeout(function () {
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }, 1000);
+  }
+
   function showCorrectSlot() {
     var slot = document.getElementById('blink-missing-slot');
     if (slot) {
@@ -518,6 +550,7 @@ var FillInTheBlink = (function () {
     showCorrectSlot();
     triggerCelebration();
     playCorrectSound();
+    floatTimerBonus(5);
 
     // Haptic
     if (navigator.vibrate) navigator.vibrate(100);
@@ -551,6 +584,7 @@ var FillInTheBlink = (function () {
     // Visual feedback
     showWrongSlot();
     playWrongSound();
+    floatTimerBonus(-3);
 
     // Haptic
     if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
@@ -929,6 +963,28 @@ var FillInTheBlink = (function () {
       '.blink-key-eliminated {',
       '  visibility: hidden;',
       '  pointer-events: none;',
+      '}',
+
+      /* Timer bonus float animation */
+      '.blink-timer-bonus {',
+      '  position: absolute;',
+      '  font-size: 32px;',
+      '  font-weight: 900;',
+      '  pointer-events: none;',
+      '  z-index: 20;',
+      '  transform: translateX(-50%);',
+      '  animation: blink-bonus-float 1s ease-out forwards;',
+      '}',
+      '.blink-bonus-positive {',
+      '  color: #2E9E6B;',
+      '}',
+      '.blink-bonus-negative {',
+      '  color: #EE5A24;',
+      '}',
+      '@keyframes blink-bonus-float {',
+      '  0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.2); }',
+      '  30% { opacity: 1; transform: translateX(-50%) translateY(var(--fly-y, -80px)) scale(1); }',
+      '  100% { opacity: 0; transform: translateX(-50%) translateY(var(--fly-y, -80px)) scale(0.8); }',
       '}',
 
       /* End-of-session overlay */
