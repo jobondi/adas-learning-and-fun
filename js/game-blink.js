@@ -451,16 +451,18 @@ var FillInTheBlink = (function () {
     el.className = 'blink-timer-bonus ' + (isPositive ? 'blink-bonus-positive' : 'blink-bonus-negative');
     el.textContent = label;
 
-    // Position it over the word area
-    var wordRect = elWordDisplay.getBoundingClientRect();
+    // Position it over the missing letter slot
+    var slot = document.getElementById('blink-missing-slot');
+    var anchor = slot || elWordDisplay;
+    var anchorRect = anchor.getBoundingClientRect();
     var timerRect = elTimerBar.getBoundingClientRect();
     var parentRect = elWordDisplay.closest('.screen-inner').getBoundingClientRect();
 
-    el.style.left = (wordRect.left - parentRect.left + wordRect.width / 2) + 'px';
-    el.style.top = (wordRect.top - parentRect.top) + 'px';
+    el.style.left = (anchorRect.left - parentRect.left + anchorRect.width / 2) + 'px';
+    el.style.top = (anchorRect.top - parentRect.top) + 'px';
 
     // Calculate how far to fly up to reach the timer
-    var dy = timerRect.top - wordRect.top;
+    var dy = timerRect.top - anchorRect.top;
     el.style.setProperty('--fly-y', dy + 'px');
 
     elWordDisplay.closest('.screen-inner').appendChild(el);
