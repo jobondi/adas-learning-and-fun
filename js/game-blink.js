@@ -451,21 +451,28 @@ var FillInTheBlink = (function () {
     el.className = 'blink-timer-bonus ' + (isPositive ? 'blink-bonus-positive' : 'blink-bonus-negative');
     el.textContent = label;
 
-    // Position it over the missing letter slot
+    // Find the missing letter slot and position the bonus over it
     var slot = document.getElementById('blink-missing-slot');
-    var anchor = slot || elWordDisplay;
-    var anchorRect = anchor.getBoundingClientRect();
+    var wordAreaRect = elWordArea.getBoundingClientRect();
     var timerRect = elTimerBar.getBoundingClientRect();
-    var parentRect = elWordDisplay.closest('.screen-inner').getBoundingClientRect();
 
-    el.style.left = (anchorRect.left - parentRect.left + anchorRect.width / 2) + 'px';
-    el.style.top = (anchorRect.top - parentRect.top) + 'px';
+    if (slot) {
+      var slotRect = slot.getBoundingClientRect();
+      // Position relative to elWordArea (which has position: relative)
+      el.style.left = (slotRect.left - wordAreaRect.left + slotRect.width / 2) + 'px';
+      el.style.top = (slotRect.top - wordAreaRect.top) + 'px';
+    } else {
+      // Fallback: center of word area
+      el.style.left = '50%';
+      el.style.top = '50%';
+    }
 
-    // Calculate how far to fly up to reach the timer
-    var dy = timerRect.top - anchorRect.top;
+    // Calculate how far to fly up from the slot to the timer bar
+    var startTop = slot ? slot.getBoundingClientRect().top : wordAreaRect.top;
+    var dy = timerRect.top - startTop;
     el.style.setProperty('--fly-y', dy + 'px');
 
-    elWordDisplay.closest('.screen-inner').appendChild(el);
+    elWordArea.appendChild(el);
 
     // Adjust time
     timeRemaining = Math.max(0, Math.min(timeRemaining + amount, TOTAL_TIME));
@@ -548,10 +555,10 @@ var FillInTheBlink = (function () {
     animating = true;
 
     // Visual feedback — timer keeps running
+    floatTimerBonus(5); // capture slot position before showCorrectSlot changes it
     showCorrectSlot();
     triggerCelebration();
     playCorrectSound();
-    floatTimerBonus(5);
 
     // Haptic
     if (navigator.vibrate) navigator.vibrate(100);
@@ -582,9 +589,9 @@ var FillInTheBlink = (function () {
     totalWrong++;
 
     // Visual feedback — timer keeps running
+    floatTimerBonus(-3); // capture slot position before showWrongSlot changes it
     showWrongSlot();
     playWrongSound();
-    floatTimerBonus(-3);
 
     // Haptic
     if (navigator.vibrate) navigator.vibrate([50, 50, 50]);
