@@ -60,37 +60,26 @@ var FillInTheBlink = (function () {
     inner.innerHTML = '';
     inner.classList.add('game-screen-inner');
 
-    // Rebuild topbar with score
-    elTopbar = document.createElement('div');
-    elTopbar.className = 'game-topbar';
-
+    // Back button (top-left)
     var backBtn = document.createElement('button');
-    backBtn.className = 'btn-back';
+    backBtn.className = 'btn-back blink-back-btn';
     backBtn.id = 'btn-back-blink';
     backBtn.textContent = '\u2190';
+    inner.appendChild(backBtn);
 
+    // Title — centered
     var title = document.createElement('h2');
+    title.className = 'blink-title';
     title.textContent = 'Fill In the Blink';
+    inner.appendChild(title);
 
+    // Score — centered under title
     elScore = document.createElement('div');
     elScore.className = 'blink-score';
     elScore.textContent = 'Score: 0';
+    inner.appendChild(elScore);
 
-    elTopbar.appendChild(backBtn);
-    elTopbar.appendChild(title);
-    elTopbar.appendChild(elScore);
-    inner.appendChild(elTopbar);
-
-    // Back button navigates to hub using the shared navigation function
-    backBtn.addEventListener('click', function () {
-      stopTimer();
-      stopBlinkInterval();
-      if (window.adaNavigateTo) {
-        window.adaNavigateTo('hub');
-      }
-    });
-
-    // Timer bar
+    // Timer bar — under score
     elTimerBar = document.createElement('div');
     elTimerBar.className = 'blink-timer-bar';
 
@@ -104,6 +93,15 @@ var FillInTheBlink = (function () {
     elTimerBar.appendChild(elTimerFill);
     elTimerBar.appendChild(elTimerText);
     inner.appendChild(elTimerBar);
+
+    // Back button navigates to hub using the shared navigation function
+    backBtn.addEventListener('click', function () {
+      stopTimer();
+      stopBlinkInterval();
+      if (window.adaNavigateTo) {
+        window.adaNavigateTo('hub');
+      }
+    });
 
     // Word display area
     elWordArea = document.createElement('div');
@@ -683,13 +681,27 @@ var FillInTheBlink = (function () {
     var style = document.createElement('style');
     style.id = 'blink-game-styles';
     style.textContent = [
-      /* Score in topbar */
+      /* Back button */
+      '.blink-back-btn {',
+      '  align-self: flex-start;',
+      '  margin-bottom: 2px;',
+      '}',
+
+      /* Title */
+      '.blink-title {',
+      '  font-size: 30px;',
+      '  font-weight: 900;',
+      '  color: var(--text);',
+      '  text-align: center;',
+      '  margin: 0;',
+      '}',
+
+      /* Score centered */
       '.blink-score {',
-      '  font-size: 22px;',
+      '  font-size: 26px;',
       '  font-weight: 900;',
       '  color: var(--pink-dark);',
-      '  white-space: nowrap;',
-      '  margin-left: auto;',
+      '  text-align: center;',
       '}',
       '.blink-score-bounce {',
       '  animation: blink-score-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);',
@@ -704,9 +716,9 @@ var FillInTheBlink = (function () {
       '.blink-timer-bar {',
       '  width: 100%;',
       '  max-width: 400px;',
-      '  height: 28px;',
+      '  height: 34px;',
       '  background: var(--white);',
-      '  border-radius: 14px;',
+      '  border-radius: 17px;',
       '  border: 3px solid var(--mint);',
       '  position: relative;',
       '  overflow: hidden;',
@@ -725,7 +737,7 @@ var FillInTheBlink = (function () {
       '  display: flex;',
       '  align-items: center;',
       '  justify-content: center;',
-      '  font-size: 18px;',
+      '  font-size: 22px;',
       '  font-weight: 900;',
       '  color: var(--text);',
       '  text-shadow: 0 1px 2px rgba(255,255,255,0.8);',
@@ -753,7 +765,7 @@ var FillInTheBlink = (function () {
       '  margin-bottom: 12px;',
       '}',
       '.blink-letter {',
-      '  font-size: 40px;',
+      '  font-size: 46px;',
       '  font-weight: 900;',
       '  color: var(--text);',
       '  letter-spacing: 4px;',
@@ -767,7 +779,7 @@ var FillInTheBlink = (function () {
       '  text-align: center;',
       '}',
       '.blink-slot-eye {',
-      '  font-size: 36px;',
+      '  font-size: 42px;',
       '  display: block;',
       '  line-height: 1;',
       '}',
@@ -792,7 +804,7 @@ var FillInTheBlink = (function () {
       '  80% { transform: translateX(6px); }',
       '}',
       '.blink-definition {',
-      '  font-size: 22px;',
+      '  font-size: 26px;',
       '  font-style: italic;',
       '  color: var(--text-light);',
       '  text-align: center;',
@@ -877,20 +889,20 @@ var FillInTheBlink = (function () {
       '  gap: 4px;',
       '}',
       '.blink-key {',
-      '  min-width: 32px;',
-      '  height: 44px;',
+      '  min-width: 34px;',
+      '  height: 48px;',
       '  border: none;',
       '  border-radius: var(--radius-sm);',
       '  background: var(--white);',
       '  color: var(--text);',
       '  font-family: var(--font);',
-      '  font-size: 22px;',
+      '  font-size: 26px;',
       '  font-weight: 900;',
       '  cursor: pointer;',
       '  box-shadow: 0 3px 0 var(--shadow-strong), 0 4px 8px var(--shadow);',
       '  transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.3s ease;',
       '  flex: 1;',
-      '  max-width: 38px;',
+      '  max-width: 42px;',
       '  display: flex;',
       '  align-items: center;',
       '  justify-content: center;',
