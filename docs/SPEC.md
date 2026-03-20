@@ -224,7 +224,7 @@ Follows the **optimal challenge** principle -- start easy and increase difficult
 1. Timer starts at **3 minutes** (180 seconds)
 2. Word displayed with random missing letter (shown as em dash / blinking eye) and definition below
 3. Player taps a letter on the QWERTY keyboard
-4. **Correct:** Timer keeps running, **+5 seconds** added to clock (green "+5" floats up from word to timer bar over 1.5s), celebration animation plays, score increments, auto-advances to next word after 1.5s
+4. **Correct:** Timer keeps running, **+5 seconds** added to clock (green "+5" floats up from word to timer bar over 1.5s), celebration animation plays, words completed counter increments, auto-advances to next word after 1.5s
 5. **Wrong:** Timer keeps running, **-3 seconds** subtracted from clock (orange "-3" floats up from word to timer bar over 1.5s), wrong letter is disabled, X appears on slot with shake animation, unlocks after 1.5s
 6. After 1/2/3 wrong guesses, 5/10/15 incorrect keys are eliminated from the keyboard (fly-away animation)
 7. When timer reaches 0, end-of-session overlay appears
@@ -243,7 +243,7 @@ Random celebration from a pool of 3 (extensible):
 - **Sparkle**: Sparkle particles burst outward from the word
 - **Confetti**: Colorful confetti pieces fly in all directions
 - **Emoji Burst**: Thumbs up, smiley, and star emojis float outward from the word
-- **Timer bonus**: Green "+5" label floats up from word area to timer bar (1.5s ease-out), adds 5 seconds
+- **Timer bonus**: Green "+5" label floats up from the missing letter slot to timer bar (1.5s ease-out), adds 5 seconds
 
 Plus: score bounce animation, ascending two-note chime (C5->E5), haptic vibration (100ms)
 
@@ -253,7 +253,7 @@ Celebration particle positions are computed in JS using `cos()`/`sin()` and pass
 - X replaces the missing letter slot
 - Slot shakes side-to-side
 - Guessed key is disabled (no color change)
-- **Timer penalty**: Orange "-3" label floats up from word area to timer bar (1.5s ease-out), subtracts 3 seconds
+- **Timer penalty**: Orange "-3" label floats up from the missing letter slot to timer bar (1.5s ease-out), subtracts 3 seconds
 - After 500ms delay, additional keys fly away off the keyboard
 - Descending sawtooth buzz sound, double-buzz haptic
 
@@ -261,7 +261,7 @@ Celebration particle positions are computed in JS using `cos()`/`sin()` and pass
 
 ### 6.7 End-of-Session Stats
 - "Time's Up!" header
-- Score: number of words completed
+- Words Completed: count of correct answers
 - Wrong guesses: total count
 - Scrollable word list in dictionary style (bold word + definition)
 - "Play Again!" button to restart

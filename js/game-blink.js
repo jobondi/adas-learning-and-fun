@@ -76,7 +76,7 @@ var FillInTheBlink = (function () {
     // Score — centered under title
     elScore = document.createElement('div');
     elScore.className = 'blink-score';
-    elScore.textContent = 'Score: 0';
+    elScore.textContent = 'Words Completed: 0';
     inner.appendChild(elScore);
 
     // Timer bar — under score
@@ -241,7 +241,7 @@ var FillInTheBlink = (function () {
   }
 
   function renderScore() {
-    elScore.textContent = 'Score: ' + score;
+    elScore.textContent = 'Words Completed: ' + score;
   }
 
   function renderTimer() {
