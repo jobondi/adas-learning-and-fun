@@ -11,8 +11,8 @@ var FillInTheBlink = (function () {
   // ===================== Config =====================
 
   var TOTAL_TIME = 180; // 3 minutes in seconds
-  var CORRECT_PAUSE = 3000; // ms to pause on correct answer
-  var WRONG_DISPLAY = 3000; // ms to show wrong answer feedback
+  var CORRECT_ADVANCE = 1500; // ms before advancing to next word after correct
+  var WRONG_DISPLAY = 1500; // ms to show wrong answer feedback
   var KEY_ELIMINATE_DELAY = 500; // ms before keys fly away after wrong
   var CELEBRATION_ANIMATIONS = ['sparkle', 'confetti', 'emoji-burst'];
   var QWERTY_ROWS = [
@@ -472,7 +472,7 @@ var FillInTheBlink = (function () {
     // Clean up after animation
     setTimeout(function () {
       if (el.parentNode) el.parentNode.removeChild(el);
-    }, 1000);
+    }, 1600);
   }
 
   function showCorrectSlot() {
@@ -544,9 +544,8 @@ var FillInTheBlink = (function () {
 
   function onCorrectGuess() {
     animating = true;
-    pauseTimer();
 
-    // Visual feedback
+    // Visual feedback — timer keeps running
     showCorrectSlot();
     triggerCelebration();
     playCorrectSound();
@@ -567,13 +566,12 @@ var FillInTheBlink = (function () {
     // Record in engine session
     E.recordCorrect(session, currentWord);
 
-    // Advance after celebration
+    // Advance after animation completes
     setTimeout(function () {
       animating = false;
-      resumeTimer();
       elCelebration.innerHTML = '';
       loadNextWord();
-    }, CORRECT_PAUSE);
+    }, CORRECT_ADVANCE);
   }
 
   function onWrongGuess(letter) {
@@ -581,7 +579,7 @@ var FillInTheBlink = (function () {
     wrongGuessLetters.push(letter.toUpperCase());
     totalWrong++;
 
-    // Visual feedback
+    // Visual feedback — timer keeps running
     showWrongSlot();
     playWrongSound();
     floatTimerBonus(-3);
@@ -973,7 +971,7 @@ var FillInTheBlink = (function () {
       '  pointer-events: none;',
       '  z-index: 20;',
       '  transform: translateX(-50%);',
-      '  animation: blink-bonus-float 1s ease-out forwards;',
+      '  animation: blink-bonus-float 1.5s ease-out forwards;',
       '}',
       '.blink-bonus-positive {',
       '  color: #2E9E6B;',
@@ -982,9 +980,10 @@ var FillInTheBlink = (function () {
       '  color: #EE5A24;',
       '}',
       '@keyframes blink-bonus-float {',
-      '  0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.2); }',
-      '  30% { opacity: 1; transform: translateX(-50%) translateY(var(--fly-y, -80px)) scale(1); }',
-      '  100% { opacity: 0; transform: translateX(-50%) translateY(var(--fly-y, -80px)) scale(0.8); }',
+      '  0% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1.3); }',
+      '  50% { opacity: 1; transform: translateX(-50%) translateY(calc(var(--fly-y, -80px) * 0.6)) scale(1); }',
+      '  80% { opacity: 0.8; transform: translateX(-50%) translateY(var(--fly-y, -80px)) scale(0.9); }',
+      '  100% { opacity: 0; transform: translateX(-50%) translateY(var(--fly-y, -80px)) scale(0.7); }',
       '}',
 
       /* End-of-session overlay */

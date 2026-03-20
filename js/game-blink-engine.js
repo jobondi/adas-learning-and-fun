@@ -15,8 +15,8 @@ var BlinkEngine = (function () {
 
   var ROUND_DURATION = 180; // seconds (3 minutes)
 
-  var CORRECT_PAUSE = 3000;    // ms — pause clock during correct animation
-  var WRONG_PAUSE = 3000;      // ms — wrong animation plays, clock keeps ticking
+  var CORRECT_PAUSE = 1500;    // ms — animation plays, clock keeps running
+  var WRONG_PAUSE = 1500;      // ms — wrong animation plays, clock keeps running
   var KEY_REMOVE_DELAY = 500;  // ms — delay before keys animate out
 
   // ===================== Word List =====================

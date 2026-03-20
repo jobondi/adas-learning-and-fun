@@ -18,12 +18,12 @@ describe('BlinkEngine', () => {
 
     test('CORRECT_PAUSE timing constant exists and is a number', () => {
       expect(typeof E.CORRECT_PAUSE).toBe('number');
-      expect(E.CORRECT_PAUSE).toBe(3000);
+      expect(E.CORRECT_PAUSE).toBe(1500);
     });
 
     test('WRONG_PAUSE timing constant exists and is a number', () => {
       expect(typeof E.WRONG_PAUSE).toBe('number');
-      expect(E.WRONG_PAUSE).toBe(3000);
+      expect(E.WRONG_PAUSE).toBe(1500);
     });
 
     test('KEY_REMOVE_DELAY timing constant exists and is a number', () => {
