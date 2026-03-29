@@ -13,7 +13,7 @@ var BlinkEngine = (function () {
 
   var ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-  var ROUND_DURATION = 180; // seconds (3 minutes)
+  var ROUND_DURATION = 120; // seconds (2 minutes)
 
   var CORRECT_PAUSE = 1500;    // ms — animation plays, clock keeps running
   var WRONG_PAUSE = 1500;      // ms — wrong animation plays, clock keeps running

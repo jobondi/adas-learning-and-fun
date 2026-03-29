@@ -10,7 +10,7 @@ var FillInTheBlink = (function () {
 
   // ===================== Config =====================
 
-  var TOTAL_TIME = 180; // 3 minutes in seconds
+  var TOTAL_TIME = 120; // 2 minutes in seconds
   var CORRECT_ADVANCE = 1500; // ms before advancing to next word after correct
   var WRONG_DISPLAY = 1500; // ms to show wrong answer feedback
   var KEY_ELIMINATE_DELAY = 500; // ms before keys fly away after wrong
@@ -563,7 +563,6 @@ var FillInTheBlink = (function () {
     animating = true;
 
     // Visual feedback — timer keeps running
-    floatTimerBonus(5); // capture slot position before showCorrectSlot changes it
     showCorrectSlot();
     triggerCelebration();
     playCorrectSound();

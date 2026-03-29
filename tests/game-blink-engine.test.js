@@ -12,8 +12,8 @@ describe('BlinkEngine', () => {
       expect(E.ALPHABET.length).toBe(26);
     });
 
-    test('ROUND_DURATION is 180 seconds', () => {
-      expect(E.ROUND_DURATION).toBe(180);
+    test('ROUND_DURATION is 120 seconds', () => {
+      expect(E.ROUND_DURATION).toBe(120);
     });
 
     test('CORRECT_PAUSE timing constant exists and is a number', () => {
