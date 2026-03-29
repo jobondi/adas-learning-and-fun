@@ -207,8 +207,8 @@ var FillInTheBlink = (function () {
       setTimeout(function () {
         // Close it back to a dash
         if (eye.parentNode) eye.textContent = '\u2014'; // —
-      }, 400);
-    }, 2500);
+      }, 600);
+    }, 4000);
   }
 
   function stopBlinkInterval() {

@@ -232,7 +232,7 @@ Follows the **optimal challenge** principle -- start easy and increase difficult
 ### 6.5 Missing Letter Display
 The missing letter slot uses a **single eye emoji** with a JS-driven blink effect:
 - **Default state (closed):** An em dash character, inline with the other letters
-- **Blink (every 2.5s):** JS `setInterval` swaps the em dash to the eye emoji for 400ms, then swaps back
+- **Blink (every 4s):** JS `setInterval` swaps the em dash to the eye emoji for 600ms, then swaps back
 - No CSS animation -- pure content swap via `textContent` for an instant, crisp blink
 - Blink interval is started on each new word and stopped on correct answer, end of session, or back navigation
 
