@@ -202,24 +202,27 @@ var FillInTheBlink = (function () {
     blinkIntervalId = setInterval(function () {
       var eye = document.querySelector('.blink-slot-eye');
       if (!eye) return;
-      // Open the eye (scale up from thin line to full)
+      // Swap to eye at 15% height instantly (no transition), then grow open
+      eye.style.transition = 'none';
       eye.textContent = '\uD83D\uDC41\uFE0F'; // 👁️
       eye.style.transform = 'scaleY(0.15)';
-      requestAnimationFrame(function () {
-        eye.style.transform = 'scaleY(1)';
-      });
+      // Force layout so the 15% state renders before we animate
+      eye.offsetHeight; // eslint-disable-line no-unused-expressions
+      eye.style.transition = 'transform 1s ease';
+      eye.style.transform = 'scaleY(1)';
       setTimeout(function () {
         // Close the eye (scale down to thin line, then swap to dash)
         if (!eye.parentNode) return;
         eye.style.transform = 'scaleY(0.15)';
         setTimeout(function () {
           if (eye.parentNode) {
+            eye.style.transition = 'none';
             eye.textContent = '\u2014'; // —
             eye.style.transform = 'scaleY(1)';
           }
-        }, 500);
-      }, 1500);
-    }, 4000);
+        }, 1000);
+      }, 2000);
+    }, 5000);
   }
 
   function stopBlinkInterval() {
@@ -865,7 +868,7 @@ var FillInTheBlink = (function () {
       '  font-size: inherit;',
       '  display: block;',
       '  line-height: 1;',
-      '  transition: transform 0.5s ease;',
+      '  transition: transform 1s ease;',
       '}',
       '.blink-letter-correct {',
       '  color: #2E9E6B;',
