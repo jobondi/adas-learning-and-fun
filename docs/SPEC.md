@@ -203,10 +203,10 @@ The game logic is split into two layers:
 A spelling and vocabulary game for grades 2-4. A word is displayed with **one missing letter** (random position), represented by a **single blinking eye** (closed by default as an em dash, opens to show the eye emoji briefly every 2.5 seconds via JS `setInterval`). A short definition appears below as a clue. The player taps the correct letter on a custom on-screen QWERTY keyboard.
 
 ### 6.2 Word List
-- **300 hardcoded words** with short definitions, organized by grade level:
-  - Grade 2: ~105 words (e.g., "brave", "climb", "whale")
-  - Grade 3: ~105 words (e.g., "ancient", "explore", "habitat")
-  - Grade 4: ~90 words (e.g., "abandon", "boundary", "evidence")
+- **600 hardcoded words** with short definitions, organized by grade level:
+  - Grade 2: ~200 words (e.g., "brave", "climb", "whale", "arrow", "frost")
+  - Grade 3: ~200 words (e.g., "ancient", "explore", "habitat", "culture", "gravity")
+  - Grade 4: ~200 words (e.g., "abandon", "boundary", "evidence", "catalyst", "diagnose")
 - Each word has: `word` (lowercase), `def` (5-12 word definition), `grade` (2, 3, or 4)
 
 ### 6.3 Difficulty Progression

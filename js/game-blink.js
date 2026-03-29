@@ -226,6 +226,10 @@ var FillInTheBlink = (function () {
     elWordDisplay.innerHTML = '';
     var letters = currentWord.word.toUpperCase().split('');
 
+    // Scale font down for long words so they fit on one line
+    var fontSize = letters.length <= 7 ? 52 : Math.max(32, Math.floor(380 / letters.length));
+    elWordDisplay.style.fontSize = fontSize + 'px';
+
     for (var i = 0; i < letters.length; i++) {
       var span = document.createElement('span');
       span.className = 'blink-letter';
@@ -829,11 +833,11 @@ var FillInTheBlink = (function () {
       '  justify-content: center;',
       '  align-items: center;',
       '  gap: 6px;',
-      '  flex-wrap: wrap;',
+      '  flex-wrap: nowrap;',
       '  margin-bottom: 12px;',
       '}',
       '.blink-letter {',
-      '  font-size: 52px;',
+      '  font-size: inherit;',
       '  font-weight: 900;',
       '  color: var(--text);',
       '  letter-spacing: 4px;',
@@ -847,7 +851,7 @@ var FillInTheBlink = (function () {
       '  text-align: center;',
       '}',
       '.blink-slot-eye {',
-      '  font-size: 48px;',
+      '  font-size: inherit;',
       '  display: block;',
       '  line-height: 1;',
       '}',
