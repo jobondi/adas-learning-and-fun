@@ -202,27 +202,32 @@ var FillInTheBlink = (function () {
     blinkIntervalId = setInterval(function () {
       var eye = document.querySelector('.blink-slot-eye');
       if (!eye) return;
-      // Swap to eye at 15% height instantly (no transition), then grow open
+      // Swap to eye at 30% height (no transition), then grow open
       eye.style.transition = 'none';
       eye.textContent = '\uD83D\uDC41\uFE0F'; // 👁️
-      eye.style.transform = 'scaleY(0.15)';
-      // Force layout so the 15% state renders before we animate
-      eye.offsetHeight; // eslint-disable-line no-unused-expressions
-      eye.style.transition = 'transform 1s ease';
-      eye.style.transform = 'scaleY(1)';
+      eye.style.transform = 'scaleY(0.3)';
+      // Double rAF ensures the browser has painted the squished state
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          if (!eye.parentNode) return;
+          eye.style.transition = 'transform 0.8s ease-out';
+          eye.style.transform = 'scaleY(1)';
+        });
+      });
       setTimeout(function () {
         // Close the eye (scale down to thin line, then swap to dash)
         if (!eye.parentNode) return;
-        eye.style.transform = 'scaleY(0.15)';
+        eye.style.transition = 'transform 0.8s ease-in';
+        eye.style.transform = 'scaleY(0.3)';
         setTimeout(function () {
           if (eye.parentNode) {
             eye.style.transition = 'none';
             eye.textContent = '\u2014'; // —
             eye.style.transform = 'scaleY(1)';
           }
-        }, 1000);
-      }, 2000);
-    }, 5000);
+        }, 800);
+      }, 1800);
+    }, 3000);
   }
 
   function stopBlinkInterval() {
