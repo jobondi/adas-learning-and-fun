@@ -13,6 +13,11 @@
 - CSS injected dynamically by UI controllers (not in style.css) for game-specific styles
 - `window.adaNavigateTo` exposed by app.js for cross-module navigation
 
+## Deployment
+- **GitHub Pages**: https://jobondi.github.io/adas-learning-and-fun/
+- Deploys automatically on push to `main`
+- No build step required — static files served directly
+
 ## Conventions
 - Keep spec version at v1.0 until user says otherwise
 - Always update SPEC.md, tests, and code comments when functionality changes
