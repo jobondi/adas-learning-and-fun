@@ -1,5 +1,5 @@
 // Service Worker — network-first for HTML/JS, cache-first for fonts/images
-var CACHE_NAME = 'ada-fun-v4';
+var CACHE_NAME = 'ada-fun-v5';
 var ASSETS = [
   '/',
   '/index.html',

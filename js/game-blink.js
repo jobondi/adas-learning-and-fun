@@ -202,12 +202,23 @@ var FillInTheBlink = (function () {
     blinkIntervalId = setInterval(function () {
       var eye = document.querySelector('.blink-slot-eye');
       if (!eye) return;
-      // Open the eye
+      // Open the eye (scale up vertically)
       eye.textContent = '\uD83D\uDC41\uFE0F'; // 👁️
+      eye.style.transform = 'scaleY(0)';
+      requestAnimationFrame(function () {
+        eye.style.transform = 'scaleY(1)';
+      });
       setTimeout(function () {
-        // Close it back to a dash
-        if (eye.parentNode) eye.textContent = '\u2014'; // —
-      }, 600);
+        // Close the eye (scale down vertically)
+        if (!eye.parentNode) return;
+        eye.style.transform = 'scaleY(0)';
+        setTimeout(function () {
+          if (eye.parentNode) {
+            eye.textContent = '\u2014'; // —
+            eye.style.transform = 'scaleY(1)';
+          }
+        }, 300);
+      }, 1500);
     }, 4000);
   }
 
@@ -854,6 +865,7 @@ var FillInTheBlink = (function () {
       '  font-size: inherit;',
       '  display: block;',
       '  line-height: 1;',
+      '  transition: transform 0.3s ease;',
       '}',
       '.blink-letter-correct {',
       '  color: #2E9E6B;',
