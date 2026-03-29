@@ -210,14 +210,14 @@ var FillInTheBlink = (function () {
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
           if (!eye.parentNode) return;
-          eye.style.transition = 'transform 0.4s ease-out';
+          eye.style.transition = 'transform 0.25s ease-out';
           eye.style.transform = 'scaleY(1)';
         });
       });
       setTimeout(function () {
-        // Close the eye (scale down to thin line, then swap to dash)
+        // Close the eye immediately after opening
         if (!eye.parentNode) return;
-        eye.style.transition = 'transform 0.4s ease-in';
+        eye.style.transition = 'transform 0.25s ease-in';
         eye.style.transform = 'scaleY(0.3)';
         setTimeout(function () {
           if (eye.parentNode) {
@@ -225,9 +225,9 @@ var FillInTheBlink = (function () {
             eye.textContent = '\u2014'; // —
             eye.style.transform = 'scaleY(1)';
           }
-        }, 400);
-      }, 1200);
-    }, 2000);
+        }, 250);
+      }, 250);
+    }, 2500);
   }
 
   function stopBlinkInterval() {
